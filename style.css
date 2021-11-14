@@ -1,0 +1,59 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+
+h5.card-title {
+    margin-bottom: 0;
+    margin: .1em 0;
+}
+
+.card-actions > span {
+    margin-right: 10px;
+    font-size: 0.9em;
+}
+
+
+.wrapper {
+    margin: 0 auto;
+    max-width: 1000px;
+    margin-top:300px;
+}
+.tasks__section__body {
+    padding: 30px;
+}
+
+.task__section__content__tasks {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    flex: 0 1 auto;
+}
+
+.card-header {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/* .card {
+    border: 10px solid rosybrown;
+    flex-basis: 32%;
+}
+
+.card:not(:first-child, :nth-child(4n)) {
+    margin-left: 2%;
+}
+
+.card:not(:nth-child(-n+3)) {
+    margin-top: 2%;
+} */
+
+.card:not(:last-child) {
+    margin-bottom: 10px;
+}
