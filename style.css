@@ -4,6 +4,36 @@
     margin: 0;
 }
 
+.wrapper {
+    margin: 0 auto;
+    margin-top:70px;
+    max-width: 1000px;
+}
+
+.card {
+    flex: 0 1 auto;
+}
+
+hr {
+    margin:0 !important;
+}
+
+
+.show-done > div.done {
+    display: block !important;
+}
+
+.card-header {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header > h5 > i {
+    display: none;
+    font-size: 1.2em;
+    line-height: 0;
+}
 
 h5.card-title {
     margin-bottom: 0;
@@ -15,44 +45,18 @@ h5.card-title {
     font-size: 0.9em;
 }
 
-
-.wrapper {
-    margin: 0 auto;
-    max-width: 1000px;
-    margin-top:300px;
-}
-.tasks__section__body {
-    padding: 30px;
+.card-actions > i {
+    cursor: pointer;
+    opacity: 0.8;
 }
 
-.task__section__content__tasks {
-    display: flex;
-    flex-direction: column;
+.card-actions > i:hover {
+    opacity: 1;
 }
 
-.card {
-    flex: 0 1 auto;
+.card-body {
+    color:#444;
 }
-
-.card-header {
-    display: flex; 
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-/* .card {
-    border: 10px solid rosybrown;
-    flex-basis: 32%;
-}
-
-.card:not(:first-child, :nth-child(4n)) {
-    margin-left: 2%;
-}
-
-.card:not(:nth-child(-n+3)) {
-    margin-top: 2%;
-} */
 
 .card:not(:last-child) {
     margin-bottom: 10px;
