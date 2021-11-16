@@ -58,6 +58,22 @@ h5.card-title {
     color:#444;
 }
 
+
+.datepicker {
+    margin-top: 80px !important;
+}
+
+.form-control {
+    border: none !important;
+    /* border-bottom: 1px solid black !important; */
+    border-radius: 0 !important;
+}
+
+.form-control:focus, .form-control:active {
+    outline:0px !important;
+    box-shadow: none !important;
+}
+
 .card:not(:last-child) {
     margin-bottom: 10px;
 }
