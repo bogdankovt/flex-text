@@ -18,6 +18,9 @@ hr {
     margin:0 !important;
 }
 
+h5.card-title {
+    font-size: 1.1rem;
+}
 
 .show-done > div.done {
     display: block !important;

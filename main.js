@@ -7,7 +7,7 @@ function createTask(task) {
         tasksElement.style.display = 'none';
     }
 
-    tasksElement.id = task.id;
+    tasksElement.id = `task${task.id}`;
 
     let taskHeader = createTaskHeader(task);
     let taskBody = createTaskBody(task);
@@ -31,10 +31,10 @@ function createTaskHeader(task) {
     actionContentElem.textContent = `${taskValidDateInterval(task.cre, task.exp_date)}`;
 
     let removeIcon = header.querySelector('.remove-icon');
-    removeIcon.addEventListener('click', deleteElem);
+    removeIcon.addEventListener('click', removeTask);
     
     let editIcon = header.querySelector('.edit');
-    editIcon.addEventListener('click', function(){ createModalForTask(task)})
+    editIcon.addEventListener('click', () => createModalForTask(task));
 
     if(task.is_done) {
         header.classList.add('bg-success');
@@ -65,7 +65,7 @@ function createTaskBody(task) {
 function taskValidDateInterval(a, b) {
     return `${moment(a).format('MMMM D')} - ${moment(b).format('MMMM D')}`
 }
-function deleteElem() {
+function removeTask() {
     this.closest('div.card').remove();
 }
 function showTasks() {
@@ -75,44 +75,34 @@ function showTasks() {
 }
 function createModalForTask(task) {
 
-    taskEditModal.querySelector('.new-title').value = task.title;
-    taskEditModal.querySelector('.new-desc').value = task.desc;
-    taskEditModal.querySelector('.new-exp-date').value = task.exp_date.format('YYYY-MM-DD');
-    
+    taskEditTitle.val(task.title);  //title
+    taskEditDesc.val(task.desc); //desc
 
-    // taskEditModal.querySelector('.modal-footer').innerHTML += `<input class="new-is-done" type="checkbox" data-toggle="toggle" data-width="100" data-size="xs" data-on="Ready" data-off="Not Ready" data-onstyle="success" data-offstyle="danger">`
+    let formatExpDate = task.exp_date.format('YYYY-MM-DD'); //format exp date
 
+    taskEditExpDate.val(formatExpDate) //exp_date
+    taskEditExpDate.datepicker('update', formatExpDate); //update picker
 
+    taskEditIsDone.bootstrapToggle(task.is_done ? 'on' : 'off');//isdone button
 
-    let t = $('.new-is-done')
-    if(task.is_done) {
-        t.bootstrapToggle('on')
-    }else{
-        t.bootstrapToggle('off')
-    }
+    taskEditModal.modal('show'); // show the curr edit modal
 
-    $('#taskEditModal').modal('show')
-
-    // let saveButton = taskEditModal.querySelector('.save__button__edit__task');
-    // saveButton.addEventListener('click', () => saveChanges(task))
-
+    taskEditSaveButton.click(() => saveChanges(task));
 
 }
-
 function saveChanges(task) {
 
+    taskEditSaveButton.off('click') //remove event
     
-    console.log(this)
+    task.title = taskEditTitle.val();
+    task.desc = taskEditDesc.val();
+    task.exp_date = moment(taskEditExpDate.val());
+    task.is_done = taskEditIsDone.prop('checked');
     
-    task.title = taskElement.querySelector('.new-title').value;
-    task.desc = taskElement.querySelector('.new-desc').value;
-    // task.exp_date = moment(taskElement.querySelector('.new-exp-date').value)
-    // task.is_done = taskElement.querySelector('.new-is-done').checked ? true : false;
-    
+    $(`#task${task.id}`).replaceWith($(createTask(task)))
 
-    tasksContainer.replaceChild(createTask(task), repElement)
+    taskEditModal.modal('hide');
 
-    // let element = taskElement.querySelector(`#task${taskElement.id}`)
 }
 
 class Task {
@@ -145,14 +135,22 @@ tasks.sort((a,b) => {
       return 0;
 })
 
+//tasks container
 let tasksContainer = document.querySelector('.task__section__content__tasks');
 
 //add checkbox listener
 let checkboxAllTask = document.querySelector('.checkbox__All__Task') 
 checkboxAllTask.addEventListener('change', showTasks)
 
-let taskEditModal = document.querySelector('#taskEditModal');
-
+//Valiablet to task edit modal
+let taskEditModal = $('.modal');
+let taskEditTitle = $('.edit-title');
+let taskEditDesc = $('.edit-desc');
+let taskEditExpDate = $('.edit-exp-date');
+let taskEditIsDone = $('.edit-is-done');
+let taskEditSaveButton = $('.task-save-button');
+ 
+//draw tasks
 tasks.forEach(task => {
 
     let taskElem = createTask(task);
