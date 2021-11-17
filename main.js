@@ -4,7 +4,7 @@ function createTask(task) {
 
     if(task.is_done) {
         tasksElement.classList.add('done')
-        tasksElement.style.display = 'none';
+
     }
 
     tasksElement.id = `task${task.id}`;
@@ -38,11 +38,6 @@ function createTaskHeader(task) {
 
     if(task.is_done) {
         header.classList.add('bg-success');
-        let title = header.querySelector('h5');
-        title.style.textDecoration = 'line-through';
-
-        let checkIcon = title.querySelector('i');
-        checkIcon.style.display = 'inline';
     }
     else if(!task.exp_date.isSameOrAfter(moment(), 'date')) {
         header.classList.add('bg-danger');
@@ -106,7 +101,6 @@ function saveChanges(task) {
 function addformReset() {
     taskAddForm.get(0).reset();
     taskAddForm.find($('.edit-exp-date')).datepicker('update');
-    taskAddForm.find($('.edit-is-done').bootstrapToggle('off'));
 }
 function addNewTask() {
 
@@ -117,27 +111,30 @@ function addNewTask() {
         tasks.length + 1, 
         addFormContext.taskTitle, 
         addFormContext.taskDesc, 
-        addFormContext.taskIsDone == 'on' ? true : false , 
+        addFormContext.taskIsDone = false, 
         moment(addFormContext.taskExpDate));
 
     $('#collapseNewTask').collapse('hide');  //hide form 
     
     tasks.push(newTask);
     tasksContainer.append(createTask(newTask));
-    setTimeout(addformReset, 1000)
+    addformReset()
 }
 function loadAddForm(taskEditForm) {
 
     taskEditForm.get(0).reset()
 
     let addTaskForm  = taskEditForm.clone();
-    addTaskForm.attr('name', 'addTaskForm');
-    addTaskForm.find('.task-save-button').click(addNewTask);
-    addTaskForm.appendTo($('.collapse > .card'));
 
+    addTaskForm.attr('name', 'addTaskForm');
+    addTaskForm.find('.task-save-button').addClass('w-100').text('Create').click(addNewTask);
+    addTaskForm.find('.edit-is-done').remove()
+
+    addTaskForm.appendTo($('.collapse > .card'));
     return addTaskForm;
     
 }
+
 
 
 class Task {
@@ -174,8 +171,10 @@ tasks.sort((a,b) => {
 let tasksContainer = document.querySelector('.task__section__content__tasks');
 
 //add checkbox listener
-let checkboxAllTask = document.querySelector('.checkbox__All__Task') 
+let checkboxAllTask = document.querySelector('.checkbox__All__Task')
+checkboxAllTask.checked = false;
 checkboxAllTask.addEventListener('change', showTasks)
+
 
 //Valiables to task edit modal
 let taskEditModal = $('.modal');

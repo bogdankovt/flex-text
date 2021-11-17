@@ -21,9 +21,20 @@ hr {
 h5.card-title {
     font-size: 1.1rem;
 }
+.done {
+    display: none;
+}
 
-.show-done > div.done {
-    display: block !important;
+.done h5 {
+    text-decoration: line-through;
+}
+
+.done h5 > i {
+    display: inline !important;
+}
+
+.show-done > .done {
+    display: flex;
 }
 
 .card-header {
@@ -31,6 +42,7 @@ h5.card-title {
     justify-content: space-between;
     align-items: center;
 }
+
 
 .card-header > h5 > i {
     display: none;
