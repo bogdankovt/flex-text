@@ -15,22 +15,23 @@
     <div class="wrapper ">
         <div class="tasks__section__body card px-4 pb-4">
 
-            <div class="tasks__section__header py-4 d-flex d-flex justify-content-between">
-                <div>
-                    <a class="text-success" data-toggle="collapse" href="#collapseNewTask" role="button" aria-expanded="false" aria-controls="collapseNewTask">
+            <div class="tasks__section__header py-4">
+                
+                <div class="d-flex justify-content-between">
+                    <a class="text-success createTaskButton" data-toggle="collapse" href="#collapseNewTask" role="button" aria-expanded="false" aria-controls="collapseNewTask">
                         Create new
                     </a>
-                    <div class="collapse mt-4" id="collapseNewTask">
-                        <div class="card card-body">
-                          </i>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                        </div>
+                    <div class="form-check">
+                        <input class="form-check-input checkbox__All__Task" type="checkbox" value="" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                          All
+                        </label>
                     </div>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input checkbox__All__Task" type="checkbox" value="" id="flexCheckDefault">
-                    <label class="form-check-label" for="flexCheckDefault">
-                      All
-                    </label>
+                <div class="collapse mt-4 addTaskContainer" id="collapseNewTask">
+                    <div class="card card-body">
+                        <h5 class="mb-3">Create new Task</h5>
+                    </div>
                 </div>
             </div>
             
@@ -49,24 +50,32 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <input type="text" class="form-control edit-title">
-                                <hr/>
+                        <form name="taskEditForm">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <i class="bi bi-fonts input-group-text" id="taskNewTitle"></i>
+                                </div>
+                                <input name="taskTitle" type="text" class="form-control edit-title" aria-describedby="taskNewTitle" placeholder="Title">
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control edit-desc">
-                                <hr/>
+                            <div class="input-group mt-3">
+                                <div class="input-group-prepend">
+                                  <i class="bi bi-type input-group-text" id="taskNewDesc"></i>
+                                </div>
+                                <input name="taskDesc" type="text" class="form-control edit-desc" aria-describedby="taskNewDesc" placeholder="Description">
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control edit-exp-date"/>
-                                <hr/>
+                            <div class="input-group mt-3">
+                                <div class="input-group-prepend">
+                                  <i class="bi bi-calendar-date input-group-text" id="taskNewExpDate"></i>
+                                </div>
+                                <input name="taskExpDate" type="text" class="form-control edit-exp-date" aria-describedby="taskNewExpDate" placeholder="Expiration date">
+                            </div>
+                            <div class="modal-footer d-flex justify-content-between">
+                                <input name="taskIsDone" class="edit-is-done" type="checkbox" data-toggle="toggle" data-width="100" data-size="xs" data-on="Ready" data-off="Not Ready" data-onstyle="success" data-offstyle="danger">
+                                <button type="button" class="btn btn-sm btn-success my-1 task-save-button">Save changes</button>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-between">
-                        <input class="edit-is-done" type="checkbox" data-toggle="toggle" data-width="100" data-size="xs" data-on="Ready" data-off="Not Ready" data-onstyle="success" data-offstyle="danger">
-                        <button type="button" class="btn btn-sm btn-success my-1 task-save-button">Save changes</button>
+
+                        
                     </div>
             </div>
 

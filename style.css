@@ -68,8 +68,9 @@ h5.card-title {
 
 .form-control {
     border: none !important;
-    /* border-bottom: 1px solid black !important; */
     border-radius: 0 !important;
+    padding:0 !important;
+
 }
 
 .form-control:focus, .form-control:active {
@@ -77,6 +78,23 @@ h5.card-title {
     box-shadow: none !important;
 }
 
+.modal-footer {
+    padding: 0 !important;
+    padding-top: 1em !important;
+    border: none !important;
+}
+
 .card:not(:last-child) {
     margin-bottom: 10px;
+}
+
+
+.input-group {
+    border-bottom: 1px solid  #ced4da;
+}
+
+.input-group-text {
+    border: none !important;
+    background-color: #fff !important;
+
 }

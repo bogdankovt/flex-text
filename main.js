@@ -31,7 +31,7 @@ function createTaskHeader(task) {
     actionContentElem.textContent = `${taskValidDateInterval(task.cre, task.exp_date)}`;
 
     let removeIcon = header.querySelector('.remove-icon');
-    removeIcon.addEventListener('click', removeTask);
+    removeIcon.addEventListener('click', () => removeTask(task));
     
     let editIcon = header.querySelector('.edit');
     editIcon.addEventListener('click', () => createModalForTask(task));
@@ -65,13 +65,14 @@ function createTaskBody(task) {
 function taskValidDateInterval(a, b) {
     return `${moment(a).format('MMMM D')} - ${moment(b).format('MMMM D')}`
 }
-function removeTask() {
-    this.closest('div.card').remove();
+function removeTask(task) {
+
+    tasks.splice(tasks.indexOf(task), 1)
+    $(`#task${task.id}`).remove()
+
 }
 function showTasks() {
-    if(this.checked) tasksContainer.classList.add('show-done')
-    else tasksContainer.classList.remove('show-done')
-    
+    tasksContainer.classList.toggle('show-done')  
 }
 function createModalForTask(task) {
 
@@ -87,12 +88,10 @@ function createModalForTask(task) {
 
     taskEditModal.modal('show'); // show the curr edit modal
 
-    taskEditSaveButton.click(() => saveChanges(task));
+    taskEditSaveButton.get(0).onclick = () => saveChanges(task);
 
 }
 function saveChanges(task) {
-
-    taskEditSaveButton.off('click') //remove event
     
     task.title = taskEditTitle.val();
     task.desc = taskEditDesc.val();
@@ -104,6 +103,42 @@ function saveChanges(task) {
     taskEditModal.modal('hide');
 
 }
+function addformReset() {
+    taskAddForm.get(0).reset();
+    taskAddForm.find($('.edit-exp-date')).datepicker('update');
+    taskAddForm.find($('.edit-is-done').bootstrapToggle('off'));
+}
+function addNewTask() {
+
+    const addformData = new FormData(taskAddForm.get(0))
+    const addFormContext = Object.fromEntries(addformData.entries())
+
+    let newTask = new Task(
+        tasks.length + 1, 
+        addFormContext.taskTitle, 
+        addFormContext.taskDesc, 
+        addFormContext.taskIsDone == 'on' ? true : false , 
+        moment(addFormContext.taskExpDate));
+
+    $('#collapseNewTask').collapse('hide');  //hide form 
+    
+    tasks.push(newTask);
+    tasksContainer.append(createTask(newTask));
+    setTimeout(addformReset, 1000)
+}
+function loadAddForm(taskEditForm) {
+
+    taskEditForm.get(0).reset()
+
+    let addTaskForm  = taskEditForm.clone();
+    addTaskForm.attr('name', 'addTaskForm');
+    addTaskForm.find('.task-save-button').click(addNewTask);
+    addTaskForm.appendTo($('.collapse > .card'));
+
+    return addTaskForm;
+    
+}
+
 
 class Task {
     constructor(id, title, desc, is_done, exp_date) {
@@ -142,14 +177,19 @@ let tasksContainer = document.querySelector('.task__section__content__tasks');
 let checkboxAllTask = document.querySelector('.checkbox__All__Task') 
 checkboxAllTask.addEventListener('change', showTasks)
 
-//Valiablet to task edit modal
+//Valiables to task edit modal
 let taskEditModal = $('.modal');
 let taskEditTitle = $('.edit-title');
 let taskEditDesc = $('.edit-desc');
 let taskEditExpDate = $('.edit-exp-date');
 let taskEditIsDone = $('.edit-is-done');
 let taskEditSaveButton = $('.task-save-button');
- 
+
+//forms
+let taskEditForm = $('form[name="taskEditForm"');
+let taskAddForm = loadAddForm(taskEditForm)
+
+
 //draw tasks
 tasks.forEach(task => {
 
