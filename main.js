@@ -28,7 +28,7 @@ function createTaskHeader(task) {
                         </div>`;
     
     let actionContentElem = header.querySelector('.action-content');
-    actionContentElem.textContent = `${taskValidDateInterval(task.cre, task.exp_date)}`;
+    actionContentElem.textContent = `${taskValidDateInterval(task.createdDate, task.exp_date)}`;
 
     let removeIcon = header.querySelector('.remove-icon');
     removeIcon.addEventListener('click', () => removeTask(task));
@@ -62,7 +62,7 @@ function taskValidDateInterval(a, b) {
 }
 function removeTask(task) {
 
-    fetch(`${tasksEndpoint}/${task.id}`, {
+    fetch(`${deleteTaskEndpoint}/${task.id}`, {
         method: 'DELETE', 
     })
     .then(response => response.json())
@@ -91,6 +91,26 @@ function createModalForTask(task) {
 }
 function saveChanges(task) {
     
+    fetch(`${tasksEndpoint}/${task.id}`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "title": taskEditTitle.val(),
+            "desc":  taskEditDesc.val(),
+            "isDone": taskEditIsDone.prop('checked'),
+            "dueDate": moment(taskEditExpDate.val())
+        })})
+        .then(r => r.json())
+        .then(r => { 
+            let newTask = new Task(r.taskId, r.title, r.desc, r.isDone, moment(r.dueDate))
+            $(`#task${task.id}`).replaceWith($(createTask(newTask)))
+            taskEditModal.modal('hide');
+        })
+
+
+
     task.title = taskEditTitle.val();
     task.desc = taskEditDesc.val();
     task.exp_date = moment(taskEditExpDate.val());
@@ -102,26 +122,33 @@ function saveChanges(task) {
 
 }
 function addformReset() {
-    taskAddForm.get(0).reset();
-    taskAddForm.find($('.edit-exp-date')).datepicker('update');
+    setTimeout(() => {
+        taskAddForm.get(0).reset();
+        $(".edit-exp-date").datepicker("setDate",'now')
+    }, 1000)
 }
 function addNewTask() {
 
     const addformData = new FormData(taskAddForm.get(0))
     const addFormContext = Object.fromEntries(addformData.entries())
 
-    let newTask = new Task(
-        tasks.length + 1, 
-        addFormContext.taskTitle, 
-        addFormContext.taskDesc, 
-        addFormContext.taskIsDone = false, 
-        moment(addFormContext.taskExpDate));
+    fetch(tasksEndpoint, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "title": addFormContext.taskTitle,
+            "desc":  addFormContext.taskDesc,
+            "dueDate": addFormContext.taskExpDate})})
+        .then(r => r.json())
+        .then(r => { 
+            let newTask = new Task(r.taskId, r.title, r.desc, r.isDone, moment(r.dueDate))
+            tasksContainer.append(createTask(newTask));
+            $('#collapseNewTask').collapse('hide');  //hide form 
+            addformReset()
+        })
 
-    $('#collapseNewTask').collapse('hide');  //hide form 
-    
-    tasks.push(newTask);
-    tasksContainer.append(createTask(newTask));
-    addformReset()
 }
 function loadAddForm(taskEditForm) {
 
@@ -138,11 +165,11 @@ function loadAddForm(taskEditForm) {
     
 }
 function getAndDrawTasks() {
-    fetch(tasksEndpoint)
+    fetch(`${tasksEndpoint}?all=true`)
     .then(r => r.json())
     .then(r => 
         r.forEach(t => {
-            let task =  new Task(t.taskId, t.title, t.desc, t.isDone, !t.dueDate ? moment() : moment(t.dueDate))
+            let task =  new Task(t.taskId, t.title, t.desc, t.isDone, moment(t.dueDate))
             tasksContainer.append(createTask(task)) 
         })
     )
@@ -160,24 +187,6 @@ class Task {
     }
 }
 
-// let tasks = new Array();
-
-// tasks.push(new Task(tasks.length + 1, 'Learn Js', 'Simple learn js', false, moment("2021-11-15")))
-// tasks.push(new Task(tasks.length + 1, 'Learn Html', 'Simple learn html', true, moment("2021-12-31")))
-// tasks.push(new Task(tasks.length + 1, 'Learn Css', 'Simple learn Css', false, moment("2021-11-20")))
-// tasks.push(new Task(tasks.length + 1, 'Learn Java', 'Java', false, moment("2021-12-31")))
-// tasks.push(new Task(tasks.length + 1, 'Some ASP.NET', 'ASP.NET', true, moment("2021-12-5")))
-// tasks.push(new Task(tasks.length + 1, 'Some Learn', 'Learn', true, moment("2021-11-30")))
-
-// tasks.sort((a,b) => {
-//     if (a.is_done < b.is_done) {
-//         return 1;
-//       }
-//       if (a.is_done > b.is_done) {
-//         return -1;
-//       }
-//       return 0;
-// })
 
 //tasks container
 let tasksContainer = document.querySelector('.task__section__content__tasks');
@@ -200,11 +209,10 @@ let taskEditSaveButton = $('.task-save-button');
 let taskEditForm = $('form[name="taskEditForm"');
 let taskAddForm = loadAddForm(taskEditForm)
 
-
 //draw tasks
-tasks.forEach(task => {
 
-let tasksEndpoint = 'http://localhost:5000/tasks'
+let tasksEndpoint = 'http://localhost:5000/lists/18/tasks'
+let deleteTaskEndpoint = 'http://localhost:5000/tasks'
 
 getAndDrawTasks()
 
