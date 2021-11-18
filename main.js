@@ -62,8 +62,11 @@ function taskValidDateInterval(a, b) {
 }
 function removeTask(task) {
 
-    tasks.splice(tasks.indexOf(task), 1)
-    $(`#task${task.id}`).remove()
+    fetch(`${tasksEndpoint}/${task.id}`, {
+        method: 'DELETE', 
+    })
+    .then(response => response.json())
+    .then(r => $(`#task${task.id}`).remove())
 
 }
 function showTasks() {
