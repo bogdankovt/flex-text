@@ -62,7 +62,7 @@ function taskValidDateInterval(a, b) {
 }
 function removeTask(task) {
 
-    fetch(`${deleteTaskEndpoint}/${task.id}`, {
+    fetch(`${taskEndpoint}/${task.id}`, {
         method: 'DELETE', 
     })
     .then(response => response.json())
@@ -91,12 +91,13 @@ function createModalForTask(task) {
 }
 function saveChanges(task) {
     
-    fetch(`${tasksEndpoint}/${task.id}`, {
-        method: 'PATCH', 
+    fetch(`${taskEndpoint}/${task.id}/edit`, {
+        method: 'PUT', 
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            "taskId":task.id,
             "title": taskEditTitle.val(),
             "desc":  taskEditDesc.val(),
             "isDone": taskEditIsDone.prop('checked'),
@@ -108,6 +109,8 @@ function saveChanges(task) {
             $(`#task${task.id}`).replaceWith($(createTask(newTask)))
             taskEditModal.modal('hide');
         })
+
+
 
 
 
@@ -212,7 +215,7 @@ let taskAddForm = loadAddForm(taskEditForm)
 //draw tasks
 
 let tasksEndpoint = 'http://localhost:5000/lists/18/tasks'
-let deleteTaskEndpoint = 'http://localhost:5000/tasks'
+let taskEndpoint = 'http://localhost:5000/tasks'
 
 getAndDrawTasks()
 
