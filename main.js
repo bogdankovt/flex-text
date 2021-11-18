@@ -134,7 +134,16 @@ function loadAddForm(taskEditForm) {
     return addTaskForm;
     
 }
-
+function getAndDrawTasks() {
+    fetch(tasksEndpoint)
+    .then(r => r.json())
+    .then(r => 
+        r.forEach(t => {
+            let task =  new Task(t.taskId, t.title, t.desc, t.isDone, !t.dueDate ? moment() : moment(t.dueDate))
+            tasksContainer.append(createTask(task)) 
+        })
+    )
+}
 
 
 class Task {
@@ -148,24 +157,24 @@ class Task {
     }
 }
 
-let tasks = new Array();
+// let tasks = new Array();
 
-tasks.push(new Task(tasks.length + 1, 'Learn Js', 'Simple learn js', false, moment("2021-11-15")))
-tasks.push(new Task(tasks.length + 1, 'Learn Html', 'Simple learn html', true, moment("2021-12-31")))
-tasks.push(new Task(tasks.length + 1, 'Learn Css', 'Simple learn Css', false, moment("2021-11-20")))
-tasks.push(new Task(tasks.length + 1, 'Learn Java', 'Java', false, moment("2021-12-31")))
-tasks.push(new Task(tasks.length + 1, 'Some ASP.NET', 'ASP.NET', true, moment("2021-12-5")))
-tasks.push(new Task(tasks.length + 1, 'Some Learn', 'Learn', true, moment("2021-11-30")))
+// tasks.push(new Task(tasks.length + 1, 'Learn Js', 'Simple learn js', false, moment("2021-11-15")))
+// tasks.push(new Task(tasks.length + 1, 'Learn Html', 'Simple learn html', true, moment("2021-12-31")))
+// tasks.push(new Task(tasks.length + 1, 'Learn Css', 'Simple learn Css', false, moment("2021-11-20")))
+// tasks.push(new Task(tasks.length + 1, 'Learn Java', 'Java', false, moment("2021-12-31")))
+// tasks.push(new Task(tasks.length + 1, 'Some ASP.NET', 'ASP.NET', true, moment("2021-12-5")))
+// tasks.push(new Task(tasks.length + 1, 'Some Learn', 'Learn', true, moment("2021-11-30")))
 
-tasks.sort((a,b) => {
-    if (a.is_done < b.is_done) {
-        return 1;
-      }
-      if (a.is_done > b.is_done) {
-        return -1;
-      }
-      return 0;
-})
+// tasks.sort((a,b) => {
+//     if (a.is_done < b.is_done) {
+//         return 1;
+//       }
+//       if (a.is_done > b.is_done) {
+//         return -1;
+//       }
+//       return 0;
+// })
 
 //tasks container
 let tasksContainer = document.querySelector('.task__section__content__tasks');
@@ -192,12 +201,9 @@ let taskAddForm = loadAddForm(taskEditForm)
 //draw tasks
 tasks.forEach(task => {
 
-    let taskElem = createTask(task);
-    tasksContainer.append(taskElem);
+let tasksEndpoint = 'http://localhost:5000/tasks'
 
-});
-
-
+getAndDrawTasks()
 
 
 
