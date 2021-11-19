@@ -66,7 +66,7 @@ function removeTaskDOM(id) {
 function removeTask(task) {
 
     taskService.remove(task.id)
-        .then(r => xremoveTaskDOM(task.id), handleApiError)
+        .then(r => removeTaskDOM(task.id), handleApiError)
 
 }
 function showTasks() {
@@ -196,10 +196,9 @@ let taskService = {
         return fetch(`${tasksEndpoint}/${id}`, {
             method: 'DELETE',
         })
-        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))    
+        .then(res => res.status == 204 ? console.log('removed') : Promise.reject(res.statusText))    
     }
 
-    
 }
 
 class Task {
