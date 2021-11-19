@@ -166,11 +166,11 @@ const handleApiError = errMsg => alert(errMsg);
 
 let taskService = {
     getAll() {
-        return fetch(`${tasksEndpoint}?all=true`)
+        return fetch(`${tasksEndpoint}?listId=18&all=true`)
             .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
     },
     createNew(taskObj) {
-        return fetch(tasksEndpoint, {
+        return fetch(`${tasksEndpoint}?listId=18`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -180,7 +180,7 @@ let taskService = {
         .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
     },
     update(taskObj) {
-        return fetch(`${taskEndpoint}/${taskObj.id}/edit`, {
+        return fetch(`${tasksEndpoint}/${taskObj.taskId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ let taskService = {
         .then(res => res.ok ? res.json() : Promise.reject(res.statusText))    
     },
     remove(id) {
-        return fetch(`${taskEndpoint}/${id}`, {
+        return fetch(`${tasksEndpoint}/${id}`, {
             method: 'DELETE',
         })
         .then(res => res.ok ? res.json() : Promise.reject(res.statusText))    
@@ -233,8 +233,7 @@ let taskEditForm = $('form[name="taskEditForm"');
 let taskAddForm = loadAddForm(taskEditForm)
 
 //draw tasks
-let tasksEndpoint = 'http://localhost:5000/lists/18/tasks'
-let taskEndpoint = 'http://localhost:5000/tasks'
+let tasksEndpoint = 'http://localhost:5000/tasks'
 
 getAndRenderTasks()
 
