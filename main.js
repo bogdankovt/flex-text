@@ -66,7 +66,7 @@ function removeTaskDOM(id) {
 function removeTask(task) {
 
     taskService.remove(task.id)
-        .then(r => removeTaskDOM(task.id), handleApiError)
+        .then(r => xremoveTaskDOM(task.id), handleApiError)
 
 }
 function showTasks() {
@@ -95,11 +95,14 @@ function updateTask(task) {
         title: taskEditTitle.val(),
         desc: taskEditDesc.val(),
         isDone: taskEditIsDone.prop('checked'),
-        dueDate: moment(taskEditExpDate.val())
+        dueDate: taskEditExpDate.val()
     }
+
+    console.log('update', taskObj)
     
     taskService.update(taskObj)
     .then(res => {
+        console.log(res)
         $(`#task${task.id}`).replaceWith($(createTaskNode(mapToTask(res))))
         taskEditModal.modal('hide');
     }, handleApiError)
@@ -160,10 +163,10 @@ function getAndRenderTasks() {
 
 //global 
 const createAndAppendTaskNode = task => tasksContainer.append(createTaskNode(task));
-const handleApiError = errMsg => alert(errMsg);
+const handleApiError = errMsg => {console.log(errMsg); alert(errMsg)};
 //
 
-
+ 
 let taskService = {
     getAll() {
         return fetch(`${tasksEndpoint}?listId=18&all=true`)
