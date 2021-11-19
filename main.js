@@ -97,11 +97,12 @@ function updateTask(task) {
         isDone: taskEditIsDone.prop('checked'),
         dueDate: moment(taskEditExpDate.val())
     }
+    
     taskService.update(taskObj)
     .then(res => {
         $(`#task${task.id}`).replaceWith($(createTaskNode(mapToTask(res))))
         taskEditModal.modal('hide');
-    })
+    }, handleApiError)
 
 
 
@@ -124,7 +125,7 @@ function addNewTask() {
     }
 
     const AddTaskDOMAndResetForm = (res) => {
-            tasksContainer.append(createTaskNode(mapToTask(res)));
+            createAndAppendTaskNode(mapToTask(res));
             $('#collapseNewTask').collapse('hide');
             addformReset()
     }
@@ -159,7 +160,7 @@ function getAndRenderTasks() {
 
 //global 
 const createAndAppendTaskNode = task => tasksContainer.append(createTaskNode(task));
-const handleApiError = errMsg => { console.error(errMsg); alert(errMsg); };
+const handleApiError = errMsg => alert(errMsg);
 //
 
 
