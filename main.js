@@ -1,8 +1,8 @@
-function createTask(task) {
+function createTaskNode(task) {
     let tasksElement = document.createElement('div');
     tasksElement.classList.add('card');
 
-    if(task.is_done) {
+    if (task.is_done) {
         tasksElement.classList.add('done')
 
     }
@@ -26,20 +26,20 @@ function createTaskHeader(task) {
                             <i class="bi bi-pencil-square edit"></i>
                             <i class="bi bi-trash remove-icon"></i>
                         </div>`;
-    
+
     let actionContentElem = header.querySelector('.action-content');
     actionContentElem.textContent = `${taskValidDateInterval(task.createdDate, task.exp_date)}`;
 
     let removeIcon = header.querySelector('.remove-icon');
     removeIcon.addEventListener('click', () => removeTask(task));
-    
+
     let editIcon = header.querySelector('.edit');
     editIcon.addEventListener('click', () => createModalForTask(task));
 
-    if(task.is_done) {
+    if (task.is_done) {
         header.classList.add('bg-success');
     }
-    else if(!task.exp_date.isSameOrAfter(moment(), 'date')) {
+    else if (!task.exp_date.isSameOrAfter(moment(), 'date')) {
         header.classList.add('bg-danger');
 
         let duration = moment.duration(moment().diff(moment(task.exp_date)));
@@ -60,17 +60,17 @@ function createTaskBody(task) {
 function taskValidDateInterval(a, b) {
     return `${moment(a).format('MMMM D')} - ${moment(b).format('MMMM D')}`
 }
+function removeTaskDOM(id) {
+    $(`#task${id}`).remove()
+}
 function removeTask(task) {
 
-    fetch(`${taskEndpoint}/${task.id}`, {
-        method: 'DELETE', 
-    })
-    .then(response => response.json())
-    .then(r => $(`#task${task.id}`).remove())
+    taskService.remove(task.id)
+        .then(r => removeTaskDOM(task.id), handleApiError)
 
 }
 function showTasks() {
-    tasksContainer.classList.toggle('show-done')  
+    tasksContainer.classList.toggle('show-done')
 }
 function createModalForTask(task) {
 
@@ -86,48 +86,30 @@ function createModalForTask(task) {
 
     taskEditModal.modal('show'); // show the curr edit modal
 
-    taskEditSaveButton.get(0).onclick = () => saveChanges(task);
+    taskEditSaveButton.get(0).onclick = () => updateTask(task);
 
 }
-function saveChanges(task) {
-    
-    fetch(`${taskEndpoint}/${task.id}/edit`, {
-        method: 'PUT', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "taskId":task.id,
-            "title": taskEditTitle.val(),
-            "desc":  taskEditDesc.val(),
-            "isDone": taskEditIsDone.prop('checked'),
-            "dueDate": moment(taskEditExpDate.val())
-        })})
-        .then(r => r.json())
-        .then(r => { 
-            let newTask = new Task(r.taskId, r.title, r.desc, r.isDone, moment(r.dueDate))
-            $(`#task${task.id}`).replaceWith($(createTask(newTask)))
-            taskEditModal.modal('hide');
-        })
+function updateTask(task) {
+    let taskObj = {
+        taskId: task.id,
+        title: taskEditTitle.val(),
+        desc: taskEditDesc.val(),
+        isDone: taskEditIsDone.prop('checked'),
+        dueDate: moment(taskEditExpDate.val())
+    }
+    taskService.update(taskObj)
+    .then(res => {
+        $(`#task${task.id}`).replaceWith($(createTaskNode(mapToTask(res))))
+        taskEditModal.modal('hide');
+    })
 
 
-
-
-
-    task.title = taskEditTitle.val();
-    task.desc = taskEditDesc.val();
-    task.exp_date = moment(taskEditExpDate.val());
-    task.is_done = taskEditIsDone.prop('checked');
-    
-    $(`#task${task.id}`).replaceWith($(createTask(task)))
-
-    taskEditModal.modal('hide');
 
 }
 function addformReset() {
     setTimeout(() => {
         taskAddForm.get(0).reset();
-        $(".edit-exp-date").datepicker("setDate",'now')
+        $(".edit-exp-date").datepicker("setDate", 'now')
     }, 1000)
 }
 function addNewTask() {
@@ -135,29 +117,26 @@ function addNewTask() {
     const addformData = new FormData(taskAddForm.get(0))
     const addFormContext = Object.fromEntries(addformData.entries())
 
-    fetch(tasksEndpoint, {
-        method: 'POST', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "title": addFormContext.taskTitle,
-            "desc":  addFormContext.taskDesc,
-            "dueDate": addFormContext.taskExpDate})})
-        .then(r => r.json())
-        .then(r => { 
-            let newTask = new Task(r.taskId, r.title, r.desc, r.isDone, moment(r.dueDate))
-            tasksContainer.append(createTask(newTask));
-            $('#collapseNewTask').collapse('hide');  //hide form 
+    let taskObj = {
+        title: addFormContext.taskTitle,
+        desc: addFormContext.taskDesc,
+        dueDate: addFormContext.taskExpDate
+    }
+
+    const AddTaskDOMAndResetForm = (res) => {
+            tasksContainer.append(createTaskNode(mapToTask(res)));
+            $('#collapseNewTask').collapse('hide');
             addformReset()
-        })
+    }
+    taskService.createNew(taskObj)
+        .then(res => AddTaskDOMAndResetForm(res), handleApiError)
 
 }
 function loadAddForm(taskEditForm) {
 
     taskEditForm.get(0).reset()
 
-    let addTaskForm  = taskEditForm.clone();
+    let addTaskForm = taskEditForm.clone();
 
     addTaskForm.attr('name', 'addTaskForm');
     addTaskForm.find('.task-save-button').addClass('w-100').text('Create').click(addNewTask);
@@ -165,19 +144,59 @@ function loadAddForm(taskEditForm) {
 
     addTaskForm.appendTo($('.collapse > .card'));
     return addTaskForm;
-    
+
 }
-function getAndDrawTasks() {
-    fetch(`${tasksEndpoint}?all=true`)
-    .then(r => r.json())
-    .then(r => 
-        r.forEach(t => {
-            let task =  new Task(t.taskId, t.title, t.desc, t.isDone, moment(t.dueDate))
-            tasksContainer.append(createTask(task)) 
-        })
-    )
+function mapToTask(task) {
+    return new Task(task.taskId, task.title, task.desc, task.isDone, moment(task.dueDate));
+}
+function getAndRenderTasks() {
+    taskService.getAll()
+        .then(
+            tasks => tasks.map(mapToTask).forEach(createAndAppendTaskNode),
+            handleApiError
+        );
 }
 
+//global 
+const createAndAppendTaskNode = task => tasksContainer.append(createTaskNode(task));
+const handleApiError = errMsg => { console.error(errMsg); alert(errMsg); };
+//
+
+
+let taskService = {
+    getAll() {
+        return fetch(`${tasksEndpoint}?all=true`)
+            .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
+    },
+    createNew(taskObj) {
+        return fetch(tasksEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taskObj)
+        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
+    },
+    update(taskObj) {
+        return fetch(`${taskEndpoint}/${taskObj.id}/edit`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taskObj)
+        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))    
+    },
+    remove(id) {
+        return fetch(`${taskEndpoint}/${id}`, {
+            method: 'DELETE',
+        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))    
+    }
+
+    
+}
 
 class Task {
     constructor(id, title, desc, is_done, exp_date) {
@@ -213,11 +232,10 @@ let taskEditForm = $('form[name="taskEditForm"');
 let taskAddForm = loadAddForm(taskEditForm)
 
 //draw tasks
-
 let tasksEndpoint = 'http://localhost:5000/lists/18/tasks'
 let taskEndpoint = 'http://localhost:5000/tasks'
 
-getAndDrawTasks()
+getAndRenderTasks()
 
 
 
